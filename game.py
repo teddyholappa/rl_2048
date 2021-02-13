@@ -21,17 +21,15 @@ class Game():
 		self.locs = []
 		self.old_board = self.board
 		self.equal = False
+		self.another_move = True
 
-	def set_board(self, matrix):
-		#for testing only
-		self.board = matrix
 
 	def print_board(self):
 		print("------",int(self.score), "--------")
 		print(self.board)
 		print("------------------")
 
-	#WORKS
+	#Puts zeros on one side of the row for simple computation
 	def new_row(self, row, up_special):
 		non_zeros = []
 		new = []
@@ -48,6 +46,8 @@ class Game():
 
 		return array
 
+	#Executes the movement computation
+	#Takes direction as an argument
 	def move(self, direction):
 		self.old_board = self.board.copy()
 		self.equal = False
@@ -80,6 +80,8 @@ class Game():
 			self.board = self.board.transpose()
 		self.equal = np.array_equal(self.old_board, self.board)
 
+	#After a move, this function adds a '2' to the board w.p 2/3
+	#and adds a '4' to the board w.p 1/3
 	def add_two_or_four(self):
 		pick = np.random.randint(0,len(self.locs))
 		two_or_four = random.uniform(0,1)
@@ -88,6 +90,7 @@ class Game():
 		else:
 			self.board[self.locs[pick]] = 4
 
+	#Checks if there is another move possible when the board has no zeros
 	def like_neighbors(self):
 		like = False
 		for i in range(0,3):
@@ -99,8 +102,12 @@ class Game():
 				like = True
 		return like
 
+	'''
+	Updates the board with a two or four, checks if another move is possible
+	Returns boolean 'another_move', which, if false, should end the game.
+	'''
 	def update(self):
-		another_move = True
+		#another_move = True
 		num_zeros = len(self.locs)
 		if self.equal is False:
 			self.locs = []
@@ -113,8 +120,12 @@ class Game():
 				self.add_two_or_four()
 
 		if num_zeros == 1 or num_zeros == 0:
-			another_move = self.like_neighbors()
-		return another_move
+			self.another_move = self.like_neighbors()
+		
+		if not self.another_move:
+			print("Game over! Final Score: ", self.score)
+			self.print_board()
+			sys.exit(0)
 
 
 
