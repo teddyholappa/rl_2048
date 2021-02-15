@@ -22,7 +22,27 @@ class Game():
 		self.old_board = self.board
 		self.equal = False
 		self.another_move = True
+		self.actions = ["left", "right", "up", "down"]
 
+	def reset(self):
+		self.score = 0
+		self.board = np.zeros((4,4))
+		x1 = np.random.randint(0,3)
+		y1 = np.random.randint(0,3)
+		x2 = np.random.randint(0,3)
+		y2 = np.random.randint(0,3)
+		if (x1 == x2 and y1 == y2):
+			y2 = 3 - y2
+		self.board[x1,y1] = 2
+		self.board[x2,y2] = 2
+		self.locs = []
+		self.old_board = self.board
+		self.equal = False
+		self.another_move = True
+
+	def get_state(self):
+		x = np.ma.log2(self.board).filled(0)
+		return x.flatten()
 
 	def print_board(self):
 		print("------",int(self.score), "--------")
@@ -123,10 +143,16 @@ class Game():
 			self.another_move = self.like_neighbors()
 		
 		if not self.another_move:
-			print("Game over! Final Score: ", self.score)
-			self.print_board()
-			sys.exit(0)
+			#print("Game over! Final Score: ", self.score)
+			#self.print_board()
+			#sys.exit(0)
+			return
 
+	def get_info(self):
+		state = self.get_state()
+		reward = self.score
+		done = not self.another_move
+		return state, reward, done
 
 
 
